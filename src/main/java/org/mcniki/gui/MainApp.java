@@ -47,7 +47,6 @@ public class MainApp extends JFrame {
         setLocationRelativeTo(null); // Center window
 
         initComponents();
-        loadInitialData();
         refreshUserTable();
     }
 
@@ -96,7 +95,7 @@ public class MainApp extends JFrame {
         postPanel.add(postScrollPane, BorderLayout.CENTER);
 
         JPanel postButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton addGenericPostButton = new JButton("Add Any Post"); // Add post not tied to current user selection
+        JButton addGenericPostButton = new JButton("Add Any Post");
         addGenericPostButton.addActionListener(this::addAnyPostAction);
         editPostButton = new JButton("Edit Post");
         editPostButton.addActionListener(this::editPostAction);
@@ -114,33 +113,9 @@ public class MainApp extends JFrame {
         postPanel.add(postButtonPanel, BorderLayout.SOUTH);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, userPanel, postPanel);
-        splitPane.setResizeWeight(0.4); // Give users panel a bit less space initially
+        splitPane.setResizeWeight(0.4);
         add(splitPane);
     }
-
-    private void loadInitialData() {
-        if (userService.findAllUsers().isEmpty()) {
-            logger.info("Database is empty. Seeding initial data...");
-            DUser user1 = new DUser("john_doe", "john.doe@mcniki.com");
-            userService.saveUser(user1);
-
-            DUser user2 = new DUser("jane_smith", "jane.smith@mcniki.com");
-            userService.saveUser(user2);
-
-            DPost post1 = new DPost(DB.reference(DUser.class, user1.getId()), "John's first GUI post!", OffsetDateTime.now());
-            post1.setPublished(true);
-            postService.savePost(post1);
-
-            DPost post2 = new DPost(DB.reference(DUser.class, user1.getId()), "Another one from John via GUI.", OffsetDateTime.now().plusHours(1));
-            postService.savePost(post2);
-
-            DPost post3 = new DPost(DB.reference(DUser.class, user2.getId()), "Jane's GUI contribution.", OffsetDateTime.now().plusMinutes(30));
-            post3.setPublished(true);
-            postService.savePost(post3);
-            logger.info("Initial data seeded.");
-        }
-    }
-
     private void refreshUserTable() {
         try {
             userTableModel.setUsers(userService.findAllUsers());
